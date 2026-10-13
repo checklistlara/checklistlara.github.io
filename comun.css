@@ -1,0 +1,38 @@
+/* Estilos compartidos por la vista de operador y la vista de gerente */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #222; }
+
+/* ESTADOS: ok = operando, warn = operando con elementos sin chequear, fail = inactiva */
+.dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.ok { background: #2e9e5b; } .warn { background: #f08a24; } .fail { background: #d13c3c; }
+
+.badge { padding: 6px 14px; border-radius: 999px; color: #fff; font-size: 13px; font-weight: 600; }
+.badge.ok { background: #2e9e5b; } .badge.warn { background: #f08a24; } .badge.fail { background: #d13c3c; }
+
+.aviso { background: #fff3cd; border-left: 4px solid #f08a24; border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 14px; }
+
+.card { background: #eee; border-radius: 12px; padding: 16px; }
+.card .label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: .04em; }
+.card .value { font-size: 17px; font-weight: 600; margin-top: 4px; }
+
+.btn { display: inline-block; padding: 11px 22px; border: 0; border-radius: 8px; font: inherit; font-weight: 600; text-decoration: none; text-align: center; cursor: pointer; }
+.btn.primary { background: #444; color: #fff; }
+.btn.primary:hover { background: #222; }
+.btn.secondary { background: #bdbdbd; color: #222; }
+.btn.secondary:hover { background: #aaa; }
+.btn.danger { background: #d13c3c; color: #fff; }
+.btn.danger:hover { background: #b32d2d; }
+
+.muted { color: #666; }
+.empty { height: 100%; display: grid; place-items: center; color: #777; }
+.pronto { color: #888; font-size: 13px; font-style: italic; }
+
+/* AVISO EMERGENTE */
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translate(-50%, -20px);
+  background: #333; color: #fff; padding: 12px 22px; border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25); display: flex; flex-direction: column; gap: 2px; text-align: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 30;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast span { font-size: 13px; color: #ccc; }

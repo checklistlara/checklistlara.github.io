@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista de gerente</title>
+<link rel="stylesheet" href="comun.css">
+<link rel="stylesheet" href="gerente.css">
+</head>
+<body>
+<div class="app">
+
+  <nav class="sidebar">
+    <button class="active" data-view="machines" title="Máquinas">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    </button>
+    <button data-view="new" title="Nuevo registro">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+    </button>
+    <button id="btn-menu" title="Más opciones">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+    </button>
+  </nav>
+
+  <aside class="panel">
+    <div class="panel-head">
+      <h2>Máquinas</h2>
+      <input id="search" type="search" placeholder="Buscar máquina...">
+    </div>
+    <ul class="list" id="list"></ul>
+  </aside>
+
+  <main class="main" id="main"></main>
+
+</div>
+
+<div class="menu" id="menu" hidden>
+  <button type="button" data-action="manage">Administrar unidades</button>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lb-box">
+    <img id="lb-img" alt="Foto del chequeo">
+    <div class="lb-bar">
+      <a class="btn primary" id="lb-dl" href="#" download>Descargar</a>
+      <button type="button" class="btn secondary" id="lb-close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="comun.js"></script>
+<script src="gerente.js"></script>
+</body>
+</html>
