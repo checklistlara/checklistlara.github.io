@@ -32,6 +32,28 @@
 .main h3 { font-size: 16px; margin-bottom: 10px; }
 .main h3.gap { margin-top: 24px; }
 
+/* TABLA DE RESULTADOS (Inicio / Final) */
+.tabla { display: grid; gap: 8px; }
+.fila { display: grid; grid-template-columns: minmax(0, 1fr) 190px 190px; gap: 12px; align-items: center; }
+.fila.cab { color: #666; font-size: 13px; text-align: center; }
+.fila-nombre { font-size: 17px; color: #444; }
+.celda { min-height: 34px; padding: 4px 8px; border-radius: 8px; background: #bdbdbd; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; font-size: 14px; }
+.celda.lleno { background: #eee; }
+.celda.na { background: transparent; border: 1px dashed #bdbdbd; }
+.celda.ancha { grid-column: 2 / 4; }
+.mini { position: relative; display: inline-block; }
+.mini img { display: block; width: 52px; height: 40px; object-fit: cover; border-radius: 6px; background: #ccc; cursor: zoom-in; }
+.mini .dl { position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 5px; background: rgba(0,0,0,.65); color: #fff; }
+.mini .dl svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* BARRA DE CIERRE */
+.cierre-bar {
+  position: sticky; bottom: 0; margin: 28px -40px -32px; padding: 16px 40px;
+  background: #d5d5d5; border-top: 1px solid #bdbdbd;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.cierre-hint { font-size: 13px; color: #555; }
+
 /* ELEMENTOS EN SOLO LECTURA */
 .checks { list-style: none; background: #eee; border-radius: 12px; padding: 6px 16px; }
 .checks li { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #d5d5d5; }
@@ -78,6 +100,12 @@
 .row-actions { display: flex; align-items: center; gap: 8px; }
 .row-actions .btn { padding: 8px 16px; }
 .confirm-text { font-size: 13px; color: #8a2020; max-width: 220px; text-align: right; }
+
+/* ADMINISTRAR OPERADORES */
+.op-nuevo { display: flex; gap: 10px; max-width: 680px; margin-bottom: 6px; }
+.op-nuevo input, .op-input { flex: 1; min-width: 0; width: 100%; padding: 11px 12px; border: 0; border-radius: 8px; background: #eee; font: inherit; }
+.op-nuevo input:focus, .op-input:focus { outline: 2px solid #444; }
+.op-nuevo + .error + .manage-list { margin-top: 8px; }
 
 /* FORMULARIO */
 .form { max-width: 560px; display: grid; gap: 16px; }

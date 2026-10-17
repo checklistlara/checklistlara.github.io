@@ -21,7 +21,7 @@ const unidad = id => machines.find(m => m.id === id);
 function setNav(view) {
   vista = view;
   navButtons.forEach(b => b.classList.toggle("active", b.dataset.view === view));
-  btnMenu.classList.toggle("active", view === "manage");
+  btnMenu.classList.toggle("active", view === "manage" || view === "operadores");
 }
 
 navButtons.forEach(b => b.addEventListener("click", () => {
@@ -65,30 +65,24 @@ function nombreArchivo(m, c, src, k = 0) {
   return `${base}.${ext}`;
 }
 
-function fotoHTML(m, c, src, i, k) {
-  return `<div class="foto-ro">
-    <img class="foto-thumb" src="${esc(src)}" alt="${esc(c.nombre)} ${k + 1}" data-ver="${i}" data-slot="${k}">
-    <div class="foto-acciones">
-      <button type="button" class="btn secondary" data-ver="${i}" data-slot="${k}">Ver</button>
-      <a class="btn secondary" href="${esc(src)}" download="${esc(nombreArchivo(m, c, src, k))}">Descargar</a>
-    </div>
-  </div>`;
+// Miniatura de una foto con su botón de descarga
+function miniFotoHTML(m, c, src, i, k) {
+  return `<span class="mini">
+    <img src="${esc(src)}" alt="${esc(c.nombre)} ${k + 1}" data-ver="${i}" data-slot="${k}">
+    <a class="dl" href="${esc(src)}" download="${esc(nombreArchivo(m, c, src, k))}" title="Descargar" aria-label="Descargar"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 10l5 5 5-5M5 20h14"/></svg></a>
+  </span>`;
 }
 
-function fotosHTML(m, c, v, i) {
-  const n = cantidadFotos(c);
-  const fotos = fotosDe(c, v);
-  if (!fotos.some(Boolean)) return `<span class="sin-resp">Sin foto</span>`;
-  const items = fotos.map((src, k) => src
-    ? fotoHTML(m, c, src, i, k)
-    : `<span class="sin-resp">Foto ${k + 1}: sin subir</span>`).join("");
-  if (n === 1) return items;
-  return `<div class="fotos-ro"><div class="fotos-fila">${items}</div><div class="foto-prog">${fotos.filter(Boolean).length} de ${n} fotos</div></div>`;
-}
-
-function valorHTML(m, c, v, i) {
-  if (c.tipo === "foto") return fotosHTML(m, c, v, i);
-  if (!estaRespondido(c, v)) return `<span class="sin-resp">Sin responder</span>`;
+// Lo que va dentro de una celda de la tabla ("" = celda en blanco)
+function contenidoCelda(m, c, v, i) {
+  if (c.tipo === "foto") {
+    const n = cantidadFotos(c);
+    const fotos = fotosDe(c, v);
+    if (!fotos.some(Boolean)) return "";
+    return fotos.map((src, k) => src ? miniFotoHTML(m, c, src, i, k) : "").join("")
+      + (n > 1 ? `<span class="foto-prog">${fotos.filter(Boolean).length}/${n}</span>` : "");
+  }
+  if (!estaRespondido(c, v)) return "";
   switch (c.tipo) {
     case "slider": {
       const z = zonaDe(v);
@@ -105,18 +99,49 @@ function valorHTML(m, c, v, i) {
   }
 }
 
-function renderDetail(m) {
-  const filas = m.checks.map((raw, i) => {
+// Arma las filas de la tabla. "X inicial" y "X final" comparten fila (también se puede forzar con la propiedad "fila").
+// Un elemento sin "momento" ocupa las dos columnas.
+function armarFilas(m) {
+  const filas = [];
+  const porNombre = new Map();
+  m.checks.forEach((raw, i) => {
     const c = normalizar(raw);
-    const v = m.respuestas[i];
-    const fase = c.momento ? `<span class="hint">${c.momento === "inicio" ? "al iniciar" : "al terminar"}</span>` : "";
-    return `<li>
-      <span class="dot ${estaRespondido(c, v) ? "ok" : "fail"}"></span>
-      <span class="chk-name">${esc(c.nombre)}${fase}</span>
-      <div class="chk-val">${valorHTML(m, c, v, i)}</div>
-    </li>`;
-  }).join("");
+    if (!c.momento) { filas.push({ nombre: c.nombre, ancha: { c, i } }); return; }
+    const nombre = c.fila ?? c.nombre.replace(/\s+(inicial|final)$/i, "");
+    const clave = nombre.toLowerCase();
+    let f = porNombre.get(clave);
+    if (!f || f[c.momento]) { f = { nombre }; filas.push(f); porNombre.set(clave, f); }
+    f[c.momento] = { c, i };
+  });
+  return filas;
+}
 
+function celdaHTML(m, e, extra = "") {
+  if (!e) return `<div class="celda na"></div>`; // esa fase no aplica a este elemento
+  const html = contenidoCelda(m, e.c, m.respuestas[e.i], e.i);
+  return `<div class="celda ${html ? "lleno" : ""} ${extra}">${html}</div>`;
+}
+
+function tablaHTML(m) {
+  const filas = armarFilas(m).map(f => f.ancha
+    ? `<div class="fila"><span class="fila-nombre">${esc(f.nombre)}</span>${celdaHTML(m, f.ancha, "ancha")}</div>`
+    : `<div class="fila"><span class="fila-nombre">${esc(f.nombre)}</span>${celdaHTML(m, f.inicio)}${celdaHTML(m, f.fin)}</div>`).join("");
+  return `<div class="tabla">
+    <div class="fila cab"><span></span><span>Inicio</span><span>Final</span></div>
+    ${filas}
+  </div>`;
+}
+
+// Barra de abajo: el botón "Cerrar" solo se activa cuando el operador ya terminó su turno
+function barraCierreHTML(m) {
+  const texto = m.inicio ? "En operación. Se podrá cerrar cuando el operador termine su turno."
+    : m.terminada ? `Turno terminado el ${formatFecha(m.turnoFin)}. Al cerrar se limpian los resultados y la unidad queda lista para el siguiente turno.`
+    : "No hay un turno por cerrar.";
+  return `<span class="cierre-hint">${texto}</span>
+    <button type="button" class="btn primary" id="btn-cerrar" ${m.terminada ? "" : "disabled"}>Cerrar</button>`;
+}
+
+function renderDetail(m) {
   main.innerHTML = `
     <div class="detail-head">
       <h1>${esc(m.name)}</h1>
@@ -129,11 +154,26 @@ function renderDetail(m) {
       <div class="card"><div class="label">Última revisión</div><div class="value">${esc(m.revision)}</div></div>
       <div class="card"><div class="label">Horas de uso</div><div class="value">${m.horas.toLocaleString("es-MX", { maximumFractionDigits: 2 })} h</div></div>
       ${m.inicio ? `<div class="card"><div class="label">Operando desde</div><div class="value">${formatFecha(m.inicio)}</div></div>` : ""}
+      ${m.terminada ? `<div class="card"><div class="label">Turno</div><div class="value">${formatFecha(m.turnoInicio)} → ${formatFecha(m.turnoFin)}</div></div>` : ""}
     </div>
-    <h3>Check list</h3>
-    <ul class="checks">${filas}</ul>
+    <h3>Checklist - ${esc(m.tipo)}</h3>
+    ${tablaHTML(m)}
     <h3 class="gap">Notas</h3>
-    <div class="notes-ro">${m.notas ? esc(m.notas) : `<span class="sin-resp">Sin notas</span>`}</div>`;
+    <div class="notes-ro">${m.notas ? esc(m.notas) : `<span class="sin-resp">Sin notas</span>`}</div>
+    <div class="cierre-bar">${barraCierreHTML(m)}</div>`;
+}
+
+// Cerrar: limpia los resultados del turno terminado
+function cerrar(id) {
+  recargar();
+  const u = unidad(id);
+  if (!u || !u.terminada) { renderList(); showSelected(); return; }
+  u.cerrar();
+  if (!guardarUnidad(u)) { showToast("No se pudo cerrar", "Intenta de nuevo"); return; }
+  recargar();
+  renderList();
+  renderDetail(unidad(id));
+  showToast("Unidad cerrada", "Resultados limpios · lista para el siguiente turno");
 }
 
 /* ============ FOTOS: VER Y DESCARGAR ============ */
@@ -152,8 +192,10 @@ function cerrarFoto() { lightbox.hidden = true; }
 main.addEventListener("click", e => {
   const ver = e.target.closest("[data-ver]");
   const m = unidad(selectedId);
-  if (ver && m) abrirFoto(m, Number(ver.dataset.ver));
+  if (ver && m) abrirFoto(m, Number(ver.dataset.ver), Number(ver.dataset.slot || 0));
+  if (m && e.target.closest("#btn-cerrar")) cerrar(m.id);
 });
+
 document.getElementById("lb-close").addEventListener("click", cerrarFoto);
 lightbox.addEventListener("click", e => { if (e.target === lightbox) cerrarFoto(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") { cerrarFoto(); toggleMenu(false); } });
@@ -167,11 +209,11 @@ function renderForm() {
       <div class="row">
         <div class="field">
           <label for="f-name">Nombre</label>
-          <input id="f-name" type="text" placeholder="Ej. Torno CNC 05">
+          <input id="f-name" type="text" placeholder="Nombre de la unidad">
         </div>
         <div class="field">
           <label for="f-area">Área</label>
-          <input id="f-area" type="text" placeholder="Ej. Taller A">
+          <input id="f-area" type="text" placeholder="Area de trabajo">
         </div>
       </div>
 
@@ -251,11 +293,19 @@ btnMenu.addEventListener("click", e => { e.stopPropagation(); toggleMenu(); });
 document.addEventListener("click", e => { if (!menu.contains(e.target)) toggleMenu(false); });
 
 menu.addEventListener("click", e => {
-  if (!e.target.closest("[data-action]")) return;
+  const b = e.target.closest("[data-action]");
+  if (!b) return;
   toggleMenu(false);
   confirmDeleteId = null;
-  setNav("manage");
-  renderManage();
+  if (b.dataset.action === "operadores") {
+    editandoOpId = null;
+    confirmarOpId = null;
+    setNav("operadores");
+    renderOperadores();
+  } else {
+    setNav("manage");
+    renderManage();
+  }
 });
 
 /* ============ ADMINISTRAR UNIDADES ============ */
@@ -301,6 +351,110 @@ function eliminar(id) {
   renderList();
   renderManage();
   showToast("Unidad eliminada", esc(m.name));
+}
+
+/* ============ ADMINISTRAR OPERADORES ============ */
+let editandoOpId = null;  // operador que se está editando
+let confirmarOpId = null; // operador que pide confirmación para eliminarse
+
+const limpiarNombre = v => v.trim().replace(/\s+/g, " ");
+const nombreRepetido = (nombre, exceptoId = null) =>
+  operadores.some(o => o.id !== exceptoId && o.nombre.toLowerCase() === nombre.toLowerCase());
+const errorOp = texto => { document.getElementById("op-error").textContent = texto; };
+
+function renderOperadores() {
+  const filas = operadores.map(o => {
+    if (o.id === editandoOpId) {
+      return `<li class="manage-row" data-id="${o.id}">
+        <div class="grow"><input class="op-input" id="op-edit" type="text" value="${esc(o.nombre)}" maxlength="60"></div>
+        <div class="row-actions">
+          <button type="button" class="btn primary" data-act="guardar">Guardar</button>
+          <button type="button" class="btn secondary" data-act="cancelar">Cancelar</button>
+        </div>
+      </li>`;
+    }
+    const acciones = o.id === confirmarOpId
+      ? `<span class="confirm-text">¿Eliminar a este operador?</span>
+         <button type="button" class="btn danger" data-act="si">Sí, eliminar</button>
+         <button type="button" class="btn secondary" data-act="no">Cancelar</button>`
+      : `<button type="button" class="btn secondary" data-act="editar">Editar</button>
+         <button type="button" class="btn danger" data-act="eliminar">Eliminar</button>`;
+    return `<li class="manage-row" data-id="${o.id}">
+      <div class="grow"><div class="name">${esc(o.nombre)}</div></div>
+      <div class="row-actions">${acciones}</div>
+    </li>`;
+  }).join("");
+
+  main.innerHTML = `
+    <div class="detail-head"><h1>Administrar operadores</h1></div>
+    <form class="op-nuevo" id="op-form" novalidate>
+      <input id="op-nombre" type="text" placeholder="Nombre del nuevo operador" maxlength="60">
+      <button type="submit" class="btn primary">Registrar</button>
+    </form>
+    <div class="error" id="op-error"></div>
+    ${operadores.length ? `<ul class="manage-list" id="op-list">${filas}</ul>` : `<p class="muted">No hay operadores registrados.</p>`}`;
+
+  document.getElementById("op-form").addEventListener("submit", e => { e.preventDefault(); registrarOperador(); });
+
+  const ul = document.getElementById("op-list");
+  if (ul) ul.addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]");
+    if (!b) return;
+    const id = Number(b.closest("li").dataset.id);
+    switch (b.dataset.act) {
+      case "editar":   editandoOpId = id; confirmarOpId = null; renderOperadores(); break;
+      case "cancelar": editandoOpId = null; renderOperadores(); break;
+      case "guardar":  guardarEdicion(id); break;
+      case "eliminar": confirmarOpId = id; editandoOpId = null; renderOperadores(); break;
+      case "no":       confirmarOpId = null; renderOperadores(); break;
+      case "si":       borrarOperador(id); break;
+    }
+  });
+
+  const edit = document.getElementById("op-edit");
+  if (edit) {
+    edit.focus();
+    edit.select();
+    edit.addEventListener("keydown", e => {
+      if (e.key === "Enter") guardarEdicion(editandoOpId);
+      else if (e.key === "Escape") { editandoOpId = null; renderOperadores(); }
+    });
+  }
+}
+
+function registrarOperador() {
+  const nombre = limpiarNombre(document.getElementById("op-nombre").value);
+  if (!nombre) return errorOp("Escribe el nombre del operador.");
+  recargar(); // por si cambió desde otra pestaña
+  if (nombreRepetido(nombre)) return errorOp("Ya hay un operador con ese nombre.");
+  if (!guardarOperador({ id: nuevoIdOperador(), nombre }, { crear: true })) return errorOp("No se pudo guardar.");
+  recargar();
+  renderOperadores();
+  showToast("Operador registrado", esc(nombre));
+}
+
+function guardarEdicion(id) {
+  const nombre = limpiarNombre(document.getElementById("op-edit").value);
+  if (!nombre) return errorOp("El nombre no puede quedar vacío.");
+  recargar();
+  const actual = operadores.find(o => o.id === id);
+  if (!actual) { editandoOpId = null; renderOperadores(); return; }
+  if (nombreRepetido(nombre, id)) return errorOp("Ya hay un operador con ese nombre.");
+  if (!guardarOperador({ ...actual, nombre })) return errorOp("No se pudo guardar.");
+  editandoOpId = null;
+  recargar();
+  renderOperadores();
+  showToast("Operador actualizado", esc(nombre));
+}
+
+function borrarOperador(id) {
+  const o = operadores.find(x => x.id === id);
+  if (!o) return;
+  eliminarOperador(id);
+  confirmarOpId = null;
+  recargar();
+  renderOperadores();
+  showToast("Operador eliminado", esc(o.nombre));
 }
 
 /* ============ ACTUALIZACIÓN EN VIVO ============ */

@@ -84,11 +84,7 @@ function topHTML(m) {
 
 // Barra inferior con el botón de guardar
 function barHTML(m) {
-  const hint = m.inicio
-    ? "Operando. Al guardar se detendrá, se sumarán las horas, el chequeo quedará en blanco y volverás a ver todas las unidades."
-    : "Inactiva. Al guardar pasará a operando y solo verás esta unidad hasta que termines.";
-  return `<span class="save-hint">${hint}</span>
-    <button type="button" class="btn primary" id="btn-guardar">Guardar cambios</button>`;
+  return `<button type="button" class="btn primary" id="btn-guardar">Guardar cambios</button>`;
 }
 
 function renderChecklist(m) {
@@ -218,6 +214,7 @@ function controlHTML(c, i, v) {
         <input type="number" inputmode="decimal" id="chk-${i}" min="0" step="0.1" placeholder="0.0" value="${esc(v ?? "")}">
         <span class="unit">${esc(c.unidad || "")}</span>
       </div>`;
+
     case "booleano": {
       const tache = `<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
       const tick = `<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
@@ -226,9 +223,10 @@ function controlHTML(c, i, v) {
         <button type="button" class="bool-btn si ${v === true ? "sel" : ""}" data-bool="1" aria-pressed="${v === true}" title="Sí" aria-label="Sí">${tick}</button>
       </div>`;
     }
+
     case "acordeon": {
       const flecha = `<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`;
-      const respondido = c.opciones.includes(v);
+      const respondido = estaRespondido (c, v);
       return `<button type="button" class="acc-head ${respondido ? "answered" : ""}" id="chk-${i}" data-acc aria-expanded="false">
         <span class="acc-val">${respondido ? esc(v) : "Selecciona una opción"}</span>${flecha}
       </button>`;
@@ -238,10 +236,12 @@ function controlHTML(c, i, v) {
   }
 }
 
-// Panel con las opciones del acordeón (queda oculto hasta que se abre)
 function panelHTML(c, v) {
-  return `<div class="acc-panel" hidden>${c.opciones.map((o, k) =>
-    `<button type="button" class="acc-opt ${o === v ? "sel" : ""}" data-opt="${k}">${esc(o)}</button>`).join("")}</div>`;
+  const opciones = opcionesDe(c);
+  const botones = opciones.length
+    ? opciones.map((o, k) => `<button type="button" class="acc-opt ${o === v ? "sel" : ""}" data-opt="${k}">${esc(o)}</button>`).join("")
+    : `<span class="acc-vacio">No hay opciones registradas</span>`;
+  return `<div class="acc-panel" hidden>${botones}</div>`;
 }
 
 // Abre o cierra el acordeón de una fila (si no se indica, alterna)
@@ -320,6 +320,16 @@ function onChequeo(m, el) {
       marcar(estaRespondido(c, r[i]));
     })
     .catch(() => showToast("No se pudo leer la imagen", "Prueba con otra foto"));
+  } else if (c.tipo === "acordeon") {
+  const valor = opcionesDe(c)[Number(el.dataset.opt)];
+  r[i] = valor;
+  li.querySelectorAll(".acc-opt").forEach(b => b.classList.toggle("sel", b === el));
+  const head = li.querySelector(".acc-head");
+  head.classList.add("answered");
+  head.querySelector(".acc-val").textContent = valor;
+  toggleAcordeon(head, false); // se cierra al elegir
+  marcar(true);
+  guardarPronto(m);
   } else if (c.tipo === "booleano") {
     const valor = el.dataset.bool === "1";
     r[i] = valor;
