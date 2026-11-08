@@ -89,7 +89,7 @@ class Maquina {
 }
 
 class Olla extends Maquina {
-  static tipo = "Olla";
+  static tipo = "Camion revolvedor / Olla";
   get checks() {
     return [
 

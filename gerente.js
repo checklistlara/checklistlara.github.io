@@ -177,22 +177,58 @@ function cerrar(id) {
 }
 
 /* ============ FOTOS: VER Y DESCARGAR ============ */
-function abrirFoto(m, i) {
-  const c = normalizar(m.checks[i]);
-  const src = m.respuestas[i];
+let urlVisor = null; // dirección temporal del visor (se libera al cerrar)
+function liberarVisor() {
+  if (urlVisor) { URL.revokeObjectURL(urlVisor); urlVisor = null; }
+}
+
+// Datos técnicos de la foto, para el aviso cuando no se puede mostrar
+function resumenFoto(src) {
+  return src.startsWith("data:")
+    ? `${src.slice(0, src.indexOf(","))} · ${Math.round(src.length / 1024)} KB`
+    : src.slice(0, 80);
+}
+
+// Abre el visor con la misma imagen que muestra la miniatura
+function abrirFoto(mini) {
+  const src = mini.getAttribute("src");
   if (!src) return;
-  document.getElementById("lb-img").src = src;
+  const origen = mini.closest(".mini").querySelector("a.dl"); // de ahí se toma el nombre de descarga
+  const img = document.getElementById("lb-img");
+  const msg = document.getElementById("lb-msg");
+  liberarVisor();
+  msg.hidden = true;
+  img.hidden = false;
+
+  let reintento = false;
+  img.onerror = async () => {
+    // Si falla, se prueba otra vez convirtiendo la foto en un archivo temporal
+    if (!reintento && src.startsWith("data:")) {
+      reintento = true;
+      try {
+        const blob = await (await fetch(src)).blob();
+        urlVisor = URL.createObjectURL(blob);
+        img.src = urlVisor;
+        return;
+      } catch (err) { /* se avisa abajo */ }
+    }
+    img.hidden = true;
+    msg.hidden = false;
+    msg.textContent = `No se pudo mostrar la vista previa. Puedes descargar la foto. (${resumenFoto(src)})`;
+  };
+  img.src = src;
+
   const dl = document.getElementById("lb-dl");
   dl.href = src;
-  dl.download = nombreArchivo(m, c, src);
+  dl.download = origen ? origen.getAttribute("download") : "foto.jpg";
   lightbox.hidden = false;
 }
-function cerrarFoto() { lightbox.hidden = true; }
+function cerrarFoto() { lightbox.hidden = true; liberarVisor(); }
 
 main.addEventListener("click", e => {
   const ver = e.target.closest("[data-ver]");
   const m = unidad(selectedId);
-  if (ver && m) abrirFoto(m, Number(ver.dataset.ver), Number(ver.dataset.slot || 0));
+  if (ver && ver.tagName === "IMG") abrirFoto(ver);
   if (m && e.target.closest("#btn-cerrar")) cerrar(m.id);
 });
 
