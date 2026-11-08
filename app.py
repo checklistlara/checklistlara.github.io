@@ -12,7 +12,6 @@ Cómo ejecutarlo:
 La conexión se toma de la variable de entorno DATABASE_URL.
 Si no existe, se usa la de abajo (usuario postgres, base "checklist").
 """
-
 import os
 import sys
 import time
@@ -443,4 +442,7 @@ if __name__ == "__main__":
     print("  Operador:  http://127.0.0.1:5000/operador.html")
     print("  Gerente:   http://127.0.0.1:5000/gerente.html")
     print("  (desde el teléfono, usa la dirección IP de esta computadora en vez de 127.0.0.1)\n")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # host="0.0.0.0" permite entrar desde otros dispositivos de la red (los teléfonos).
+    # No actives debug=True junto con 0.0.0.0: el modo debug permite ejecutar código desde el navegador.
+    # Si quieres que el servidor se reinicie solo al cambiar app.py, usa: app.run(port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

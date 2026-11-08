@@ -71,245 +71,34 @@ class Maquina {
 //}
 
 class Olla extends Maquina {
-  static tipo = "Camion revolvedor / Olla";
+  static tipo = "Olla";
   get checks() {
     return [
-
-      // head
-      { tipo: "acordeon", nombre: "Operador", opciones: "operadores"},
-
       {tipo: "numero", nombre: "Kilometraje inicial", unidad: "km", momento: "inicio"},
       {tipo: "numero", nombre: "Kilometraje final", unidad: "km", momento: "fin"},
 
-      {tipo: "booleano", nombre: "Tarjeta de circulación"},
-
-      {tipo: "booleano", nombre: "Poliza de seguro"},
-
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "fin"},
-
-      //body
       {tipo: "booleano", nombre: "Licencia"},
 
       {tipo: "slider", nombre: "Nivel de combustible inicial", momento: "inicio"},
       {tipo: "slider", nombre: "Nivel de combustible final", momento: "fin"},
 
-      {tipo: "slider", nombre: "Niveles de aceite inicial", unidad: "L", momento: "inicio"},
-      {tipo: "slider", nombre: "Niveles de aceite final", unidad: "L", momento: "fin"},
+      {tipo: "numero", nombre: "Niveles de aceite inicial", unidad: "L", momento: "inicio"},
+      {tipo: "numero", nombre: "Niveles de aceite final", unidad: "L", momento: "fin"},
 
-      {tipo: "slider", nombre: "Niveles de agua inicial", unidad: "L", momento: "inicio"},
-      {tipo: "slider", nombre: "Niveles de agua final", unidad: "L", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Purgar tanque de aire", unidad: "L"},
-
-      {tipo: "booleano", nombre: "Limpieza general de la cabina", momento: "inicio"},
-      {tipo: "booleano", nombre: "Limpieza general de la cabina", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de luces", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de luces", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Tension de bandas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Tension de bandas", momento: "fin"},
-
-      {tipo: "numero", nombre: "Agua de lavado inicial", unidad: "L", momento: "inicio"},
-      {tipo: "numero", nombre: "Agua de lavado final", unidad: "L", momento: "fin"},
+      {tipo: "numero", nombre: "Niveles de agua inicial", unidad: "L", momento: "inicio"},
+      {tipo: "numero", nombre: "Niveles de agua final", unidad: "L", momento: "fin"},
 
       {tipo: "foto", nombre: "Tablero de instrumentos inicial", momento: "inicio"},
       {tipo: "foto", nombre: "Tablero de instrumentos final", momento: "fin"},
 
-      {tipo: "booleano", nombre: "Fugas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Fugas", momento: "fin"},
+      { tipo: "acordeon", nombre: "Operador", opciones: "operadores", momento: "inicio" },
 
-      {tipo: "acordeon", nombre: "Estado de las llantas", opciones: ["Bien", "Revisar", "Mal"], momento: "inicio"},
-      {tipo: "acordeon", nombre: "Estado de las llantas", opciones: ["Bien", "Revisar", "Mal"], momento: "fin"},
-
-      {tipo: "numero", nombre: "Presión de llantas inicial", unidad: "psi", momento: "inicio"},
-      {tipo: "numero", nombre: "Presión de llantas final", unidad: "psi", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar el chasis", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar el chasis", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de los rodillos del tambor", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de los rodillos del tambor", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar suspensión", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar suspensión", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar funcionamiento del abanico de enfriamiento de aceite hidraulico", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar funcionamiento del abanico de enfriamiento de aceite hidraulico", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar estado de crucetas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar estado de crucetas", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar sistema de giro de tambor", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar sistema de giro de tambor", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar estado de Dynachute", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar estado de Dynachute", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar estado físico general del tambor", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar estado físico general del tambor", momento: "fin"},
-
-      {tipo: "foto", nombre: "Fotos de la unidad: Frontal, lateral piloto, lateral copiloto y trasera", cantidad: "4", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de la unidad: Frontal, lateral piloto, lateral copiloto y trasera", cantidad: "4", momento: "fin"},
+      {tipo: "foto", nombre: "Fotos del exterior", cantidad: 4}, // 4 fotos = 4 botones
     ];
   }
 }
 
-class Retro extends Maquina {
-  static tipo = "Cargador frontal / retro"
-  get checks() {
-    return [
-      { tipo: "acordeon", nombre: "Operador", opciones: "operadores"},
-
-      {tipo: "numero", nombre: "Kilometraje inicial", unidad: "km", momento: "inicio"},
-      {tipo: "numero", nombre: "Kilometraje final", unidad: "km", momento: "fin"},
-
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Purgar filtros de diesel", momento: "inicio"},
-      {tipo: "booleano", nombre: "Purgar filtros de diesel", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar filtro de aire", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar filtro de aire", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revision de pistones", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revision de pistones", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Limpieza general de la unidad", momento: "inicio"},
-      {tipo: "booleano", nombre: "Limpieza general de la unidad", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Luces en general", momento: "inicio"},
-      {tipo: "booleano", nombre: "Luces en general", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Tensión de bandas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Tensión de bandas", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revision de sistema electricos", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revision de sistema electricos", momento: "fin"},
-
-      {tipo: "slider", nombre: "Niveles de aceite", momento: "inicio"},
-      {tipo: "slider", nombre: "Niveles de aceite", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Fugas de aceite y agua", momento: "inicio"},
-      {tipo: "booleano", nombre: "Fugas de aceite y agua", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Fugas de aceite en el sistema hidraulico", momento: "inicio"},
-      {tipo: "booleano", nombre: "Fugas de aceite en el sistema hidraulico", momento: "fin"},
-
-      {tipo: "acordeon", nombre: "Estado de las llantas", opciones: ["Bien", "Regular", "Mal"], momento: "inicio"},
-      {tipo: "acordeon", nombre: "Estado de las llantas", opciones: ["Bien", "Regular", "Mal"], momento: "fin"},
-
-      {tipo: "booleano", nombre: "Calibración de las llantas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Calibración de las llantas", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Engrasado general", momento: "inicio"},
-      {tipo: "booleano", nombre: "Engrasado general", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de graseras en general", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de graseras en general", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de cucharon de carga", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de cucharon de carga", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de estabilizadores", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de estabilizadores", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de estabilizadores", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de estabilizadores", momento: "fin"},
-
-      {tipo: "slider", nombre: "Nivel de combustible inicial", momento: "inicio" },
-      {tipo: "slider", nombre: "Nivel de combustible final", momento: "fin" },
-
-      {tipo: "foto", nombre: "Fotos de la unidad", cantidad: "4", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de la unidad", cantidad: "4", momento: "fin"},
-
-    ];
-
-  }
-}
-
-class Pipa extends Maquina {
-  static tipo = "Camión cisterna / Pipa"
-  get checks() {
-    return [
-
-      //head
-      { tipo: "acordeon", nombre: "Operador", opciones: "operadores"},
-
-      {tipo: "numero", nombre: "Kilometraje inicial", unidad: "km", momento: "inicio"},
-      {tipo: "numero", nombre: "Kilometraje final", unidad: "km", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Tarjeta de circulación"},
-
-      {tipo: "booleano", nombre: "Poliza de seguro"},
-
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de las placas", cantidad: "2", momento: "fin"},
-
-      //body
-      {tipo: "booleano", nombre: "Licencia"},
-
-      {tipo: "slider", nombre: "Nivel de combustible", momento: "inicio"},
-      {tipo: "slider", nombre: "Nivel de combustible", momento: "fin"},
-
-      {tipo: "slider", nombre: "Nivel de aceite", momento: "inicio"},
-      {tipo: "slider", nombre: "Nivel de aceite", momento: "fin"},
-
-      {tipo: "slider", nombre: "Nivel de agua", momento: "inicio"},
-      {tipo: "slider", nombre: "Nivel de agua", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar filtros de aire", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar filtros de aire", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Purgar tanques de aire", momento: "inicio"},
-      {tipo: "booleano", nombre: "Purgar tanques de aire", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Limpieza general de la unidad", momento: "inicio"},
-      {tipo: "booleano", nombre: "Limpieza general de la unidad", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Luces en general", momento: "inicio"},
-      {tipo: "booleano", nombre: "Luces en general", momento: "fin"},
-
-      {tipo: "foto", nombre: "Tablero de indicaciones", momento: "inicio"},
-      {tipo: "foto", nombre: "Tablero de indicaciones", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Fugas de aceite y agua", momento: "inicio"},
-      {tipo: "booleano", nombre: "Fugas de aceite y agua", momento: "fin"},
-
-      {tipo: "acordeon", nombre: "Estado fisico de las llantas", opciones: ["Bien", "Regular", "Mal"], momento: "inicio"},
-      {tipo: "acordeon", nombre: "Estado fisico de las llantas", opciones: ["Bien", "Regular", "Mal"], momento: "fin"},
-
-      {tipo: "numero", nombre: "Calibracion de las llantas", unidad: "psi", momento: "inicio"},
-      {tipo: "numero", nombre: "Calibracion de las llantas", unidad: "psi", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar tensores del chasis", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar tensores del chasis", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar estado fisico de cisterna", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar estado fisico de cisterna", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Fugas de agua", momento: "inicio"},
-      {tipo: "booleano", nombre: "Fugas de agua", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar estado de crucetas", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar estado de crucetas", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Revisar suspención", momento: "inicio"},
-      {tipo: "booleano", nombre: "Revisar suspención", momento: "fin"},
-
-      {tipo: "booleano", nombre: "Estado de carrocería y pintura", momento: "inicio"},
-      {tipo: "booleano", nombre: "Estado de carrocería y pintura", momento: "fin"},
-
-      {tipo: "foto", nombre: "Fotos de la unidad", cantidad: "4", momento: "inicio"},
-      {tipo: "foto", nombre: "Fotos de la unidad", cantidad: "4", momento: "fin"},
-    ];
-
-  }
-}
-
-const TIPOS = [Olla, Retro, Pipa, Maquina]; //Aquí van los tipos de maquina
+const TIPOS = [Olla, Maquina]; //Aquí van los tipos de maquina
 
 /* ============ CONEXIÓN CON EL SERVIDOR (API de Python) ============ */
 // Todas las funciones devuelven { ok, estado, datos, error }; nunca lanzan errores.
